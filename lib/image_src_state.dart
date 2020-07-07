@@ -1,7 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:nigehajilibraray/util/util.dart';
 import 'package:state_notifier/state_notifier.dart';
 
 part 'image_src_state.freezed.dart';
@@ -21,20 +20,30 @@ abstract class ImageSourceState with _$ImageSourceState {
 
 class ImageSourceStateNotifier extends StateNotifier<ImageSourceState> {
   final String urlBase = "https://www.tbs.co.jp/NIGEHAJI_tbs/gallery/img/";
+  //各話と画像数のMap
+  final Map chapterMap = {
+    1: 31,
+    2: 20,
+    3: 28,
+    4: 16,
+    5: 20,
+    6: 24,
+    7: 24,
+    8: 20,
+    9: 20,
+    10: 24,
+    11: 28
+  };
 
   ImageSourceStateNotifier() : super(const ImageSourceState()) {}
 
   void generateUrl() {
     //1話～11話
-    int chapter = 0;
-    while (chapter == 0) {
-      chapter = new Random().nextInt(11);
-    }
-    //画像番号（おそらく20枚はあるはず）
-    int imgNo = 0;
-    while (imgNo == 0) {
-      imgNo = new Random().nextInt(20);
-    }
+    int chapter = Util.getRandomInt(1, 11);
+
+    //画像番号
+    int imageCount = this.chapterMap[chapter];
+    int imgNo = Util.getRandomInt(1, imageCount);
 
     //ex:https://www.tbs.co.jp/NIGEHAJI_tbs/gallery/img/g01_01.jpg
     String newUrl = urlBase +
@@ -45,6 +54,5 @@ class ImageSourceStateNotifier extends StateNotifier<ImageSourceState> {
         ".jpg";
 
     state = state.copyWith(url: newUrl);
-    print(newUrl);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_state_notifier/flutter_state_notifier.dart';
 import 'package:nigehajilibraray/image_src_state.dart';
@@ -24,17 +25,25 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('逃げ恥ライブラリ'),
       ),
-      body: Center(
-        child: Image.network(
-          context.select<ImageSourceState, String>((state) => state.url),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.read<ImageSourceStateNotifier>().generateUrl();
-        },
-        label: Text('next'),
-        icon: Icon(Icons.navigate_next),
+      body: Column(
+        children: <Widget>[
+          FlipCard(
+            direction: FlipDirection.HORIZONTAL, // default
+            front: Container(
+              child: Image.network(
+                context.select<ImageSourceState, String>((state) => state.url),
+              ),
+            ),
+            back: Container(
+              child: Image.network(
+                context.select<ImageSourceState, String>((state) => state.url),
+              ),
+            ),
+            onFlip: () {
+              context.read<ImageSourceStateNotifier>().generateUrl();
+            },
+          ),
+        ],
       ),
     );
   }
