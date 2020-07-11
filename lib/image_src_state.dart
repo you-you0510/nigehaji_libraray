@@ -8,11 +8,11 @@ part 'image_src_state.g.dart';
 
 @freezed
 abstract class ImageSourceState with _$ImageSourceState {
-  static const String initUrl =
-      "https://www.tbs.co.jp/NIGEHAJI_tbs/gallery/img/g01_01.jpg";
-
   const factory ImageSourceState({
-    @Default(initUrl) String url,
+    @Default('https://www.tbs.co.jp/NIGEHAJI_tbs/gallery/img/g01_01.jpg')
+        String url,
+    @Default(5) int imageCount,
+    @Default([]) List<String> urlList,
   }) = _ImageSourceState;
   factory ImageSourceState.fromJson(Map<String, dynamic> json) =>
       _$ImageSourceStateFromJson(json);
@@ -35,9 +35,28 @@ class ImageSourceStateNotifier extends StateNotifier<ImageSourceState> {
     11: 28
   };
 
-  ImageSourceStateNotifier() : super(const ImageSourceState()) {}
+  ///
+  /// constructor
+  ///
+  ImageSourceStateNotifier(int count) : super(const ImageSourceState()) {
+    List<String> urls = new List<String>();
 
-  void generateUrl() {
+    for (int index = 0; index < count; index++) {
+      //重複しないようにurlを生成
+      String url = generateUrl();
+      while (urls.contains(url)) {
+        url = generateUrl();
+      }
+
+      urls.add(generateUrl());
+    }
+
+    urls.shuffle();
+
+    state = state.copyWith(imageCount: count, urlList: urls);
+  }
+
+  String generateUrl() {
     //1話～11話
     int chapter = Util.getRandomInt(1, 11);
 
@@ -54,5 +73,15 @@ class ImageSourceStateNotifier extends StateNotifier<ImageSourceState> {
         ".jpg";
 
     state = state.copyWith(url: newUrl);
+
+    return newUrl;
+  }
+
+  String getUrl(int index) {
+    return state.urlList[index];
+  }
+
+  int getUrlCount() {
+    return state.urlList.length;
   }
 }
