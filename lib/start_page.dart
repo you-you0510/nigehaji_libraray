@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_state_notifier/flutter_state_notifier.dart';
 import 'package:nigehajilibraray/image_src_state.dart';
 import 'package:nigehajilibraray/library_page.dart';
+import 'package:nigehajilibraray/nervous_breakdown_page.dart';
 import 'package:wave_slider/wave_slider.dart';
 
 class StartPage extends StatefulWidget {
@@ -10,7 +11,7 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
-  double _dragPercentage = 10;
+  double _dragPercentage = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +50,9 @@ class _StartPageState extends State<StartPage> {
                     create: (_) =>
                         //sliderの選択値をstateNotifierに渡す
                         ImageSourceStateNotifier(_dragPercentage.toInt()),
-                    //child: HomePage(),
-                    child: LibraryPage(),
+                    //child: LibraryPage(),
+                    child: NervousBreakdownPage(),
                   ),
-                  //return HomePage();
                 ),
               );
             },

@@ -3,7 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:nigehajilibraray/image_src_state.dart';
 import 'package:provider/provider.dart';
 
-class LibraryPage extends StatelessWidget {
+class NervousBreakdownPage extends StatefulWidget {
+  @override
+  _NervousBreakdownPageState createState() => _NervousBreakdownPageState();
+}
+
+class _NervousBreakdownPageState extends State<NervousBreakdownPage> {
+  //TODO: スクロールすると画面外のカードの状態が初期化される現象を解決
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +52,7 @@ Widget _flippableCard(BuildContext context, int index) {
         border: new Border(bottom: BorderSide(width: 1.0, color: Colors.grey))),
     padding: EdgeInsets.all(10.0),
     child: FlipCard(
-      flipOnTouch: false,
+      flipOnTouch: true,
       key: cardKey,
       direction: FlipDirection.HORIZONTAL, // default
       front: Card(
@@ -63,22 +70,24 @@ Widget _flippableCard(BuildContext context, int index) {
         ),
       ),
       onFlip: () {
-        //TODO: implement nervous breakdown logic.
-        bool validResult;
-        String card = context.read<ImageSourceStateNotifier>().getUrl(index);
+        ImageSourceStateNotifier notifier =
+            context.read<ImageSourceStateNotifier>();
+        String card = notifier.getUrl(index);
 
-        if (context.read<ImageSourceStateNotifier>().getFirstCard() == "") {
-          context.read<ImageSourceStateNotifier>().setFirstCard(card);
-          cardKey.currentState.toggleCard();
-        } else if (context.read<ImageSourceStateNotifier>().getSecondCard() ==
-            "") {
-          context.read<ImageSourceStateNotifier>().setSecondCard(card);
-          cardKey.currentState.toggleCard();
-        } else {
-          //validResult = context.read<ImageSourceStateNotifier>().validate();
+        notifier.setCard(card);
+        GameState state = notifier.validate();
+        switch (state) {
+          case GameState.Continue:
+            //TODO: Lock opened card.
+            break;
+          case GameState.Matched:
+            //TODO: Lock opened card pair.
+            break;
+          case GameState.Unmatched:
+            //TODO: Toggle cards.
+            break;
+          default:
         }
-
-        //context.read<ImageSourceStateNotifier>().generateUrl();
       },
     ),
   );

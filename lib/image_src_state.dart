@@ -6,6 +6,12 @@ import 'package:state_notifier/state_notifier.dart';
 part 'image_src_state.freezed.dart';
 part 'image_src_state.g.dart';
 
+enum GameState {
+  Matched,
+  Unmatched,
+  Continue,
+}
+
 @freezed
 abstract class ImageSourceState with _$ImageSourceState {
   const factory ImageSourceState({
@@ -13,6 +19,8 @@ abstract class ImageSourceState with _$ImageSourceState {
         String url,
     @Default(5) int imageCount,
     @Default([]) List<String> urlList,
+    @Default("") String firstCard,
+    @Default("") String secondCard,
   }) = _ImageSourceState;
   factory ImageSourceState.fromJson(Map<String, dynamic> json) =>
       _$ImageSourceStateFromJson(json);
@@ -21,7 +29,7 @@ abstract class ImageSourceState with _$ImageSourceState {
 class ImageSourceStateNotifier extends StateNotifier<ImageSourceState> {
   final String urlBase = "https://www.tbs.co.jp/NIGEHAJI_tbs/gallery/img/";
   //各話と画像数のMap
-  final Map chapterMap = {
+  final Map<int, int> chapterMap = {
     1: 31,
     2: 20,
     3: 28,
@@ -43,12 +51,14 @@ class ImageSourceStateNotifier extends StateNotifier<ImageSourceState> {
 
     for (int index = 0; index < count; index++) {
       //重複しないようにurlを生成
-      String url = generateUrl();
+      String url = _generateUrl();
       while (urls.contains(url)) {
-        url = generateUrl();
+        url = _generateUrl();
       }
 
-      urls.add(generateUrl());
+      //ペアにするため、２枚追加
+      urls.add(url);
+      urls.add(url);
     }
 
     urls.shuffle();
@@ -56,7 +66,7 @@ class ImageSourceStateNotifier extends StateNotifier<ImageSourceState> {
     state = state.copyWith(imageCount: count, urlList: urls);
   }
 
-  String generateUrl() {
+  String _generateUrl() {
     //1話～11話
     int chapter = Util.getRandomInt(1, 11);
 
@@ -83,5 +93,51 @@ class ImageSourceStateNotifier extends StateNotifier<ImageSourceState> {
 
   int getUrlCount() {
     return state.urlList.length;
+  }
+
+  String getFirstCard() {
+    return state.firstCard;
+  }
+
+  void setFirstCard(String card) {
+    state = state.copyWith(firstCard: card);
+  }
+
+  String getSecondCard() {
+    return state.secondCard;
+  }
+
+  void setSecondCard(String card) {
+    state = state.copyWith(secondCard: card);
+  }
+
+  void setCard(String card) {
+    if (state.firstCard == '') {
+      state = state.copyWith(firstCard: card);
+    } else {
+      state = state.copyWith(secondCard: card);
+    }
+  }
+
+  GameState validate() {
+    GameState result;
+
+    result = GameState.Continue;
+    if (state.firstCard != '' && state.secondCard != '') {
+      if (state.firstCard == state.secondCard) {
+        result = GameState.Matched;
+        print('you got it!!');
+      } else {
+        result = GameState.Unmatched;
+        print('omg...');
+      }
+    }
+
+    //init state.
+    if (result != GameState.Continue) {
+      state = state.copyWith(firstCard: '', secondCard: '');
+    }
+
+    return result;
   }
 }

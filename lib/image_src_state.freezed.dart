@@ -18,11 +18,15 @@ class _$ImageSourceStateTearOff {
   _ImageSourceState call(
       {String url = 'https://www.tbs.co.jp/NIGEHAJI_tbs/gallery/img/g01_01.jpg',
       int imageCount = 5,
-      List<String> urlList = const []}) {
+      List<String> urlList = const [],
+      String firstCard = '',
+      String secondCard = ''}) {
     return _ImageSourceState(
       url: url,
       imageCount: imageCount,
       urlList: urlList,
+      firstCard: firstCard,
+      secondCard: secondCard,
     );
   }
 }
@@ -34,6 +38,8 @@ mixin _$ImageSourceState {
   String get url;
   int get imageCount;
   List<String> get urlList;
+  String get firstCard;
+  String get secondCard;
 
   Map<String, dynamic> toJson();
   $ImageSourceStateCopyWith<ImageSourceState> get copyWith;
@@ -43,7 +49,12 @@ abstract class $ImageSourceStateCopyWith<$Res> {
   factory $ImageSourceStateCopyWith(
           ImageSourceState value, $Res Function(ImageSourceState) then) =
       _$ImageSourceStateCopyWithImpl<$Res>;
-  $Res call({String url, int imageCount, List<String> urlList});
+  $Res call(
+      {String url,
+      int imageCount,
+      List<String> urlList,
+      String firstCard,
+      String secondCard});
 }
 
 class _$ImageSourceStateCopyWithImpl<$Res>
@@ -59,11 +70,16 @@ class _$ImageSourceStateCopyWithImpl<$Res>
     Object url = freezed,
     Object imageCount = freezed,
     Object urlList = freezed,
+    Object firstCard = freezed,
+    Object secondCard = freezed,
   }) {
     return _then(_value.copyWith(
       url: url == freezed ? _value.url : url as String,
       imageCount: imageCount == freezed ? _value.imageCount : imageCount as int,
       urlList: urlList == freezed ? _value.urlList : urlList as List<String>,
+      firstCard: firstCard == freezed ? _value.firstCard : firstCard as String,
+      secondCard:
+          secondCard == freezed ? _value.secondCard : secondCard as String,
     ));
   }
 }
@@ -74,7 +90,12 @@ abstract class _$ImageSourceStateCopyWith<$Res>
           _ImageSourceState value, $Res Function(_ImageSourceState) then) =
       __$ImageSourceStateCopyWithImpl<$Res>;
   @override
-  $Res call({String url, int imageCount, List<String> urlList});
+  $Res call(
+      {String url,
+      int imageCount,
+      List<String> urlList,
+      String firstCard,
+      String secondCard});
 }
 
 class __$ImageSourceStateCopyWithImpl<$Res>
@@ -92,11 +113,16 @@ class __$ImageSourceStateCopyWithImpl<$Res>
     Object url = freezed,
     Object imageCount = freezed,
     Object urlList = freezed,
+    Object firstCard = freezed,
+    Object secondCard = freezed,
   }) {
     return _then(_ImageSourceState(
       url: url == freezed ? _value.url : url as String,
       imageCount: imageCount == freezed ? _value.imageCount : imageCount as int,
       urlList: urlList == freezed ? _value.urlList : urlList as List<String>,
+      firstCard: firstCard == freezed ? _value.firstCard : firstCard as String,
+      secondCard:
+          secondCard == freezed ? _value.secondCard : secondCard as String,
     ));
   }
 }
@@ -108,10 +134,14 @@ class _$_ImageSourceState
   const _$_ImageSourceState(
       {this.url = 'https://www.tbs.co.jp/NIGEHAJI_tbs/gallery/img/g01_01.jpg',
       this.imageCount = 5,
-      this.urlList = const []})
+      this.urlList = const [],
+      this.firstCard = '',
+      this.secondCard = ''})
       : assert(url != null),
         assert(imageCount != null),
-        assert(urlList != null);
+        assert(urlList != null),
+        assert(firstCard != null),
+        assert(secondCard != null);
 
   factory _$_ImageSourceState.fromJson(Map<String, dynamic> json) =>
       _$_$_ImageSourceStateFromJson(json);
@@ -126,10 +156,16 @@ class _$_ImageSourceState
   @JsonKey(defaultValue: const [])
   @override
   final List<String> urlList;
+  @JsonKey(defaultValue: '')
+  @override
+  final String firstCard;
+  @JsonKey(defaultValue: '')
+  @override
+  final String secondCard;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ImageSourceState(url: $url, imageCount: $imageCount, urlList: $urlList)';
+    return 'ImageSourceState(url: $url, imageCount: $imageCount, urlList: $urlList, firstCard: $firstCard, secondCard: $secondCard)';
   }
 
   @override
@@ -139,7 +175,9 @@ class _$_ImageSourceState
       ..add(DiagnosticsProperty('type', 'ImageSourceState'))
       ..add(DiagnosticsProperty('url', url))
       ..add(DiagnosticsProperty('imageCount', imageCount))
-      ..add(DiagnosticsProperty('urlList', urlList));
+      ..add(DiagnosticsProperty('urlList', urlList))
+      ..add(DiagnosticsProperty('firstCard', firstCard))
+      ..add(DiagnosticsProperty('secondCard', secondCard));
   }
 
   @override
@@ -152,7 +190,14 @@ class _$_ImageSourceState
                 const DeepCollectionEquality()
                     .equals(other.imageCount, imageCount)) &&
             (identical(other.urlList, urlList) ||
-                const DeepCollectionEquality().equals(other.urlList, urlList)));
+                const DeepCollectionEquality()
+                    .equals(other.urlList, urlList)) &&
+            (identical(other.firstCard, firstCard) ||
+                const DeepCollectionEquality()
+                    .equals(other.firstCard, firstCard)) &&
+            (identical(other.secondCard, secondCard) ||
+                const DeepCollectionEquality()
+                    .equals(other.secondCard, secondCard)));
   }
 
   @override
@@ -160,7 +205,9 @@ class _$_ImageSourceState
       runtimeType.hashCode ^
       const DeepCollectionEquality().hash(url) ^
       const DeepCollectionEquality().hash(imageCount) ^
-      const DeepCollectionEquality().hash(urlList);
+      const DeepCollectionEquality().hash(urlList) ^
+      const DeepCollectionEquality().hash(firstCard) ^
+      const DeepCollectionEquality().hash(secondCard);
 
   @override
   _$ImageSourceStateCopyWith<_ImageSourceState> get copyWith =>
@@ -174,7 +221,11 @@ class _$_ImageSourceState
 
 abstract class _ImageSourceState implements ImageSourceState {
   const factory _ImageSourceState(
-      {String url, int imageCount, List<String> urlList}) = _$_ImageSourceState;
+      {String url,
+      int imageCount,
+      List<String> urlList,
+      String firstCard,
+      String secondCard}) = _$_ImageSourceState;
 
   factory _ImageSourceState.fromJson(Map<String, dynamic> json) =
       _$_ImageSourceState.fromJson;
@@ -185,6 +236,10 @@ abstract class _ImageSourceState implements ImageSourceState {
   int get imageCount;
   @override
   List<String> get urlList;
+  @override
+  String get firstCard;
+  @override
+  String get secondCard;
   @override
   _$ImageSourceStateCopyWith<_ImageSourceState> get copyWith;
 }
