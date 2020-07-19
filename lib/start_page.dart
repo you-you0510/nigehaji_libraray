@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_state_notifier/flutter_state_notifier.dart';
 import 'package:nigehajilibraray/image_src_state.dart';
-import 'package:nigehajilibraray/library_page.dart';
 import 'package:nigehajilibraray/nervous_breakdown_page.dart';
-import 'package:wave_slider/wave_slider.dart';
 
 class StartPage extends StatefulWidget {
   @override
@@ -11,7 +9,7 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
-  double _dragPercentage = 0;
+  double _sliderValue = 1.0;
 
   @override
   Widget build(BuildContext context) {
@@ -19,21 +17,26 @@ class _StartPageState extends State<StartPage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text('How may images do you need?'),
-          WaveSlider(
-            displayTrackball: true,
-            onChanged: (double dragUpdate) {
+          Padding(
+            padding: const EdgeInsets.only(bottom: 55),
+            child: Text('How may images do you need?'),
+          ),
+          Slider.adaptive(
+            value: _sliderValue,
+            min: 1.0,
+            max: 25.0,
+            divisions: 25,
+            label: '${_sliderValue.truncate()}',
+            onChanged: (double value) {
               setState(() {
-                _dragPercentage = (dragUpdate * 20)
-                    .round()
-                    .toDouble(); // dragUpdate is a fractional value between 0 and 1
+                _sliderValue = value;
               });
             },
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'I need ' + _dragPercentage.toStringAsFixed(0) + ' images.',
+              'I need ${_sliderValue.truncate()} images.',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
@@ -49,8 +52,7 @@ class _StartPageState extends State<StartPage> {
                       ImageSourceStateNotifier, ImageSourceState>(
                     create: (_) =>
                         //sliderの選択値をstateNotifierに渡す
-                        ImageSourceStateNotifier(_dragPercentage.toInt()),
-                    //child: LibraryPage(),
+                        ImageSourceStateNotifier(_sliderValue.toInt()),
                     child: NervousBreakdownPage(),
                   ),
                 ),

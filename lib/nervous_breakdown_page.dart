@@ -81,14 +81,28 @@ Widget _flippableCard(BuildContext context, int index) {
             //TODO: Lock opened card.
             break;
           case GameState.Matched:
+            _openModalBottomSheet(context, 'You got it!\nKeep it on!!');
             //TODO: Lock opened card pair.
             break;
           case GameState.Unmatched:
+            _openModalBottomSheet(context, 'omg...');
             //TODO: Toggle cards.
             break;
           default:
         }
       },
     ),
+  );
+}
+
+void _openModalBottomSheet(BuildContext context, String message) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Text(message),
+      );
+    },
   );
 }
