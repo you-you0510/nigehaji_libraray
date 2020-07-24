@@ -19,7 +19,9 @@ abstract class ImageSourceState with _$ImageSourceState {
         String url,
     @Default(5) int imageCount,
     @Default([]) List<String> urlList,
+    @Default(0) int firstCardIndex,
     @Default("") String firstCard,
+    @Default(0) int secondCardIndex,
     @Default("") String secondCard,
   }) = _ImageSourceState;
   factory ImageSourceState.fromJson(Map<String, dynamic> json) =>
@@ -27,9 +29,9 @@ abstract class ImageSourceState with _$ImageSourceState {
 }
 
 class ImageSourceStateNotifier extends StateNotifier<ImageSourceState> {
-  final String urlBase = "https://www.tbs.co.jp/NIGEHAJI_tbs/gallery/img/";
+  final String _urlBase = "https://www.tbs.co.jp/NIGEHAJI_tbs/gallery/img/";
   //各話と画像数のMap
-  final Map<int, int> chapterMap = {
+  final Map<int, int> _chapterMap = {
     1: 31,
     2: 20,
     3: 28,
@@ -71,11 +73,11 @@ class ImageSourceStateNotifier extends StateNotifier<ImageSourceState> {
     int chapter = Util.getRandomInt(1, 11);
 
     //画像番号
-    int imageCount = this.chapterMap[chapter];
+    int imageCount = _chapterMap[chapter];
     int imgNo = Util.getRandomInt(1, imageCount);
 
     //ex:https://www.tbs.co.jp/NIGEHAJI_tbs/gallery/img/g01_01.jpg
-    String newUrl = urlBase +
+    String newUrl = _urlBase +
         "g" +
         chapter.toString().padLeft(2, "0") +
         "_" +
@@ -91,31 +93,23 @@ class ImageSourceStateNotifier extends StateNotifier<ImageSourceState> {
     return state.urlList[index];
   }
 
-  int getUrlCount() {
+  int get urlCount {
     return state.urlList.length;
   }
 
-  String getFirstCard() {
-    return state.firstCard;
+  int get firstCardIndex {
+    return state.firstCardIndex;
   }
 
-  void setFirstCard(String card) {
-    state = state.copyWith(firstCard: card);
+  int get secondCardIndex {
+    return state.secondCardIndex;
   }
 
-  String getSecondCard() {
-    return state.secondCard;
-  }
-
-  void setSecondCard(String card) {
-    state = state.copyWith(secondCard: card);
-  }
-
-  void setCard(String card) {
+  void setCard(int index, String card) {
     if (state.firstCard == '') {
-      state = state.copyWith(firstCard: card);
+      state = state.copyWith(firstCardIndex: index, firstCard: card);
     } else {
-      state = state.copyWith(secondCard: card);
+      state = state.copyWith(secondCardIndex: index, secondCard: card);
     }
   }
 
@@ -126,18 +120,16 @@ class ImageSourceStateNotifier extends StateNotifier<ImageSourceState> {
     if (state.firstCard != '' && state.secondCard != '') {
       if (state.firstCard == state.secondCard) {
         result = GameState.Matched;
-        print('you got it!!');
       } else {
         result = GameState.Unmatched;
-        print('omg...');
       }
     }
 
-    //init state.
-    if (result != GameState.Continue) {
-      state = state.copyWith(firstCard: '', secondCard: '');
-    }
-
     return result;
+  }
+
+  void initState() {
+    state = state.copyWith(
+        firstCardIndex: 0, firstCard: '', secondCardIndex: 0, secondCard: '');
   }
 }

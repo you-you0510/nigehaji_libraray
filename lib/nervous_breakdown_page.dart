@@ -1,4 +1,4 @@
-import 'package:flip_card/flip_card.dart';
+import 'package:flippable_box/flippable_box.dart';
 import 'package:flutter/material.dart';
 import 'package:nigehajilibraray/image_src_state.dart';
 import 'package:provider/provider.dart';
@@ -9,13 +9,22 @@ class NervousBreakdownPage extends StatefulWidget {
 }
 
 class _NervousBreakdownPageState extends State<NervousBreakdownPage> {
-  //TODO: スクロールすると画面外のカードの状態が初期化される現象を解決
+  List<bool> _isFlippedList;
+  List<bool> _isLockedList;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    int listCount = this.context.read<ImageSourceStateNotifier>().urlCount;
+    _isFlippedList = new List.generate(listCount, (index) => false);
+    _isLockedList = new List.generate(listCount, (index) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('逃げ恥ライブラリ'),
+        title: Text('逃げ恥神経衰弱'),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -28,10 +37,28 @@ class _NervousBreakdownPageState extends State<NervousBreakdownPage> {
                   shrinkWrap: true,
                   itemBuilder: (BuildContext context, int index) {
                     if (index <
-                        context
-                            .read<ImageSourceStateNotifier>()
-                            .getUrlCount()) {
-                      return _flippableCard(context, index);
+                        context.read<ImageSourceStateNotifier>().urlCount) {
+                      return GestureDetector(
+                        onTap: () => setState(() {
+                          _onTap(index);
+                        }),
+                        child: FlippableBox(
+                          front: Container(
+                            height: 250,
+                            child:
+                                Image.asset('images/Cartie_thinking_icon.png'),
+                          ),
+                          back: Container(
+                            height: 250,
+                            child: Image.network(
+                              context
+                                  .read<ImageSourceStateNotifier>()
+                                  .getUrl(index),
+                            ),
+                          ),
+                          isFlipped: _isFlippedList[index],
+                        ),
+                      );
                     }
 
                     return null;
@@ -42,67 +69,63 @@ class _NervousBreakdownPageState extends State<NervousBreakdownPage> {
       ),
     );
   }
-}
 
-Widget _flippableCard(BuildContext context, int index) {
-  GlobalKey<FlipCardState> cardKey = GlobalKey<FlipCardState>();
+  void _onTap(int index) {
+    ImageSourceStateNotifier notifier =
+        this.context.read<ImageSourceStateNotifier>();
+    String card = notifier.getUrl(index);
 
-  return Container(
-    decoration: new BoxDecoration(
-        border: new Border(bottom: BorderSide(width: 1.0, color: Colors.grey))),
-    padding: EdgeInsets.all(10.0),
-    child: FlipCard(
-      flipOnTouch: true,
-      key: cardKey,
-      direction: FlipDirection.HORIZONTAL, // default
-      front: Card(
-        child: Container(
-          height: 250,
-          child: Image.asset('images/Cartie_thinking_icon.png'),
-        ),
-      ),
-      back: Card(
-        child: Container(
-          height: 250,
-          child: Image.network(
-            context.read<ImageSourceStateNotifier>().getUrl(index),
-          ),
-        ),
-      ),
-      onFlip: () {
-        ImageSourceStateNotifier notifier =
-            context.read<ImageSourceStateNotifier>();
-        String card = notifier.getUrl(index);
+    //no operation when card is locked.
+    if (_isLockedList[index] == true) {
+      return;
+    }
 
-        notifier.setCard(card);
-        GameState state = notifier.validate();
-        switch (state) {
-          case GameState.Continue:
-            //TODO: Lock opened card.
-            break;
-          case GameState.Matched:
-            _openModalBottomSheet(context, 'You got it!\nKeep it on!!');
-            //TODO: Lock opened card pair.
-            break;
-          case GameState.Unmatched:
-            _openModalBottomSheet(context, 'omg...');
-            //TODO: Toggle cards.
-            break;
-          default:
-        }
+    _isFlippedList[index] = !_isFlippedList[index];
+    _isLockedList[index] = true;
+
+    notifier.setCard(index, card);
+
+    GameState state = notifier.validate();
+    switch (state) {
+      case GameState.Continue:
+        break;
+      case GameState.Matched:
+      case GameState.Unmatched:
+        _openModalBottomSheet(state);
+        break;
+      default:
+    }
+  }
+
+  void _openModalBottomSheet(GameState state) {
+    ImageSourceStateNotifier notifier =
+        this.context.read<ImageSourceStateNotifier>();
+    String message;
+
+    if (state == GameState.Matched) {
+      message = 'You got it!\nKeep it on!!';
+    } else {
+      message = 'omg...';
+    }
+
+    showModalBottomSheet(
+      context: this.context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text(message),
+        );
       },
-    ),
-  );
-}
-
-void _openModalBottomSheet(BuildContext context, String message) {
-  showModalBottomSheet(
-    context: context,
-    builder: (BuildContext context) {
-      return Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Text(message),
-      );
-    },
-  );
+    ).whenComplete(
+      () => setState(() {
+        if (state == GameState.Unmatched) {
+          _isFlippedList[notifier.firstCardIndex] = false;
+          _isLockedList[notifier.firstCardIndex] = false;
+          _isFlippedList[notifier.secondCardIndex] = false;
+          _isLockedList[notifier.secondCardIndex] = false;
+        }
+        notifier.initState();
+      }),
+    );
+  }
 }
